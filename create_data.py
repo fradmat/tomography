@@ -23,7 +23,7 @@ def geometric_matrix(density_shape, chord_interval=2):
         chord = np.ones(density_shape[0])
         mask[k*chord_interval] = chord/len(chord) #normalize
         chords.append(mask)
-    for k in range(density_shape[0] // chord_interval):
+    for k in range(density_shape[1] // chord_interval):
         mask = np.zeros(density_shape)
         chord = np.ones(density_shape[1])
         mask[:, k*chord_interval] = chord/len(chord)
@@ -38,7 +38,7 @@ def density(a, b, c, x, y):
     return c*(1-2*r**2+r**4)
 
 
-def create_ellipsis(projection_length, max_density, img_dims, geo_mat, randomize_params=True, with_noise=True):
+def create_ellipsis(projection_length, max_density, img_dims, geo_mat, randomize_params=True, noise_scale=.1):
     a = random.uniform(0.0, 0.5)
     b = random.uniform(0.0, 0.5)
     
@@ -65,10 +65,9 @@ def create_ellipsis(projection_length, max_density, img_dims, geo_mat, randomize
     Px = projection(ys, y0, b, a, c)
     
     #generate noise vectors with mean noise of 0 and standard deviation of .1
-    if with_noise:
-        scale=.1
-        noise_x = np.random.normal(scale=scale, size=len(Px))
-        noise_y = np.random.normal(scale=scale, size=len(Py))
+    if noise_scale != 0:
+        noise_x = np.random.normal(scale=noise_scale, size=len(Px))
+        noise_y = np.random.normal(scale=noise_scale, size=len(Py))
         # print(noise_x)
         # exit(0)
         Px += Px*noise_x
@@ -92,18 +91,17 @@ def create_ellipsis(projection_length, max_density, img_dims, geo_mat, randomize
     
     projection_geo_mat = geo_mat.dot(density.reshape(density.shape[1]*density.shape[0]))
     # print(len(projection_geo_mat))
-    if with_noise:
-        scale=.1
-        noise = np.random.normal(scale=scale, size=len(projection_geo_mat))
+    if noise_scale != 0:
+        noise = np.random.normal(scale=noise_scale, size=len(projection_geo_mat))
         projection_geo_mat += projection_geo_mat*noise
     
-    return density, projection_geo_mat.reshape(len(projection_geo_mat), 1), Px, Py, [x0, y0, a, b, c]
+    return density, projection_geo_mat.reshape(len(projection_geo_mat),), Px, Py, [x0, y0, a, b, c]
 
 def main(args):
-    S = 207
+    S = 208
     max_density = 100.
     randomize_params = True
-    img_dims = [63,63]
+    img_dims = [64,64]
     with_noise = True
     for e in range(int(args[1])):
         density, Px, Py, ellipsis_args = create_ellipsis(S, max_density, img_dims, randomize_params, with_noise)

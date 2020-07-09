@@ -9,13 +9,13 @@ S = 208
 max_density = 100.
 randomize_params = True
 img_dims = [64,64]
-with_noise = True
+noise_scale = .1
 geo_mat, geo_mat_plot = geometric_matrix(img_dims, 1)
     
 # plt.imshow(geo_mat_plot)
 # plt.show()
 for e in range(int(num_ellipses)):
-    density, projection_geo_mat, Px, Py, ellipsis_args = create_ellipsis(S, max_density, img_dims, geo_mat, randomize_params, with_noise)
+    density, projection_geo_mat, Px, Py, ellipsis_args = create_ellipsis(S, max_density, img_dims, geo_mat, randomize_params, noise_scale)
     print('density', density.shape, 'projections', projection_geo_mat.shape, Px.shape, Py.shape)
     fig = plt.figure(figsize=(8,8),facecolor='w')
     
