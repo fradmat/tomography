@@ -3,6 +3,7 @@ import sys
 import numpy as np
 from gp_backend import GaussianProcessEuclidean, GaussianProcessVectorial, reconstruction_grid
 from plotting import plot_emiss_signal, data_heatmap
+import matplotlib.pyplot as plt
 
 def compute_abs_error(measurement, inf_err_mask, best_data_post_std, post_data_mean):
     filtered_measurement = measurement[inf_err_mask]
@@ -25,6 +26,8 @@ def main(args):
     img_dims = [32,32]
     noise_scale = 0.
     geo_mat, geo_mat_plot = geometric_matrix(img_dims, 1)
+    # plt.imshow(geo_mat_plot.T, origin='lower')
+    # plt.show()
     densities = []
     projections = []
     density_args = []
@@ -138,15 +141,15 @@ def main(args):
         # old_rec = old_recs[:,:,means_id+500]
         # pdf_handler = PdfPages(exp + '/' + str(shot_id) + 'plots.pdf')
         original_profile = densities[means_id]
-        # plot_emiss_signal(reconstruction_means[-1], reconstruction_stds[-1],
-        #               post_data_mean, posterior_data_stds[-1],
-        #               measurement,
-        #               inf_err_mask,
-        #               # pdf_handler,
-        #               # sigma_errs[best_sigma_err_ind], sigma_fs[best_sigma_f_ind], sigma_xs[best_sigma_x_ind],
-        #                 best_hps,mll, density_shape, original_profile
-        #               )
-        # sys.stdout.flush()
+        plot_emiss_signal(reconstruction_means[-1], reconstruction_stds[-1],
+                      post_data_mean, posterior_data_stds[-1],
+                      measurement,
+                      inf_err_mask,
+                      # pdf_handler,
+                      # sigma_errs[best_sigma_err_ind], sigma_fs[best_sigma_f_ind], sigma_xs[best_sigma_x_ind],
+                        best_hps,mll, density_shape, original_profile
+                      )
+        sys.stdout.flush()
         
         mse_errs_this = compute_abs_error(measurement, inf_err_mask, 3*best_data_post_std, post_data_mean)
         mse_errs.extend(mse_errs_this)

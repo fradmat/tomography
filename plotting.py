@@ -59,7 +59,7 @@ def plot_emiss_signal(emiss_mean, emiss_std, post_data_mean, post_data_std, meas
     # mask[bdmat] = np.clip(norm_errors, a_min=0, a_max=1)
     # mask[bdmat] = norm_errors
     # em_err_to_show = mask.reshape(60,40)
-    # norm_errors = np.clip(norm_errors, a_min=0, a_max=1)
+    norm_errors = np.clip(norm_errors, a_min=0, a_max=1)
     ax_em_std.grid(linewidth=.25)
     # steps = np.arange(12, step=2)/10
     # steps = np.arange(11)/10

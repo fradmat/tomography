@@ -16,20 +16,86 @@ def projection(xs, x0, a, b, c):
     return np.asarray(P)
 
 def geometric_matrix(density_shape, chord_interval=2):
+    # chords = []
+    # # print(density_shape)
+    # for k in range(density_shape[0] // chord_interval):
+    #     mask = np.zeros(density_shape)
+    #     chord = np.ones(density_shape[0])
+    #     mask[k*chord_interval] = chord/len(chord) #normalize
+    #     chords.append(mask)
+    # for k in range(density_shape[1] // chord_interval):
+    #     mask = np.zeros(density_shape)
+    #     chord = np.ones(density_shape[1])
+    #     mask[:, k*chord_interval] = chord/len(chord)
+    #     chords.append(mask)
+    # chords = np.asarray(chords)
+    # # return chords.any(axis=0)
+    # print(chords.shape)
+    # [-4*np.pi/48, -3*np.pi/48, -2*np.pi/48, -np.pi/48, 0, np.pi/48, 2*np.pi/48, 3*np.pi/48, 4*np.pi/48]
+    
+    
+    
+    
     chords = []
-    # print(density_shape)
-    for k in range(density_shape[0] // chord_interval):
-        mask = np.zeros(density_shape)
-        chord = np.ones(density_shape[0])
-        mask[k*chord_interval] = chord/len(chord) #normalize
-        chords.append(mask)
-    for k in range(density_shape[1] // chord_interval):
-        mask = np.zeros(density_shape)
-        chord = np.ones(density_shape[1])
-        mask[:, k*chord_interval] = chord/len(chord)
-        chords.append(mask)
+    rays = {0: [[0,0.5],[-4*np.pi/48, -3*np.pi/48, -2*np.pi/48, -np.pi/48, 0, np.pi/48, 2*np.pi/48, 3*np.pi/48, 4*np.pi/48] ],
+            }
+    angular_step = np.pi/144
+    angles = np.arange(-np.pi/18, np.pi/18+angular_step, step=angular_step)
+    
+    rays = {
+        0: [[0,0.5],angles ],
+        1: [[0.5,0],angles + np.pi/2],
+        2: [[.9,0], angles + 1.5*np.pi/2],
+        3: [[.8,.98], angles*2 + 2.5*np.pi/2],
+        4: [[.98, .3], angles*2 + 2*np.pi/2],
+        5: [[0, .25], angles*2 + np.pi/4],
+        6: [[0, .8], angles - np.pi/4],
+        7: [[.35, 0], angles + np.pi/3],
+        }
+    
+    # angles = [0, np.pi/4, np.pi/2, 3*np.pi/4, np.pi, 5*np.pi/4, 3*np.pi/2, 7*np.pi/4]
+    
+    step = 1/density_shape[0]
+    
+    for ray_index in rays.keys():
+        ray = rays[ray_index]
+        start_position, angles = ray[0], ray[1]
+        for angle in angles:
+            mask = np.zeros(density_shape) 
+            # print('new angle', angle)
+            pos = start_position.copy()
+            # print(pos)
+            grid_point = [np.round(pos[0]*density_shape[0], 0), np.round(pos[1]*density_shape[1], 0)]
+            k = 0
+            intersect_pos = []
+            intersect_pos.append(grid_point)
+            # print(pos, intersect_pos[-1])
+            while True:
+                k += 1
+                step_x = step * np.cos(angle)
+                pos[0] += step_x
+                step_y = step * np.sin(angle)
+                pos[1] += step_y
+                grid_point = [np.round(pos[0]*density_shape[0], 0), np.round(pos[1]*density_shape[1], 0)]
+                
+                if 0 <= grid_point[0] <= density_shape[0] -1 and 0 <= grid_point[1] <= density_shape[1] -1 :
+                    # print (grid_point)
+                    if not grid_point in intersect_pos:
+                        intersect_pos.append(grid_point)
+                else:
+                    break
+            intersect_pos = np.asarray(intersect_pos).astype(np.int)
+            if len(intersect_pos) <= 2:
+                continue
+            # print(intersect_pos.shape)
+            X = intersect_pos[:, 1]
+            Y = intersect_pos[:, 0]
+            # print(X)
+            # print(Y)
+            mask[X, Y] = 1/len(intersect_pos)
+            mask = np.transpose(mask)
+            chords.append(mask)
     chords = np.asarray(chords)
-    # return chords.any(axis=0)
     return chords.reshape(chords.shape[0], chords.shape[1]*chords.shape[2]), chords.any(axis=0)
     # return chords, chords.any(axis=0)
 
@@ -91,6 +157,8 @@ def create_ellipsis(projection_length, max_density, img_dims, geo_mat, randomize
     
     projection_geo_mat = geo_mat.dot(density.reshape(density.shape[1]*density.shape[0]))
     # print(len(projection_geo_mat))
+    # print(projection_geo_mat.shape)
+    # exit(0)
     if noise_scale != 0:
         noise = np.random.normal(scale=noise_scale, size=len(projection_geo_mat))
         projection_geo_mat += projection_geo_mat*noise

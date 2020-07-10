@@ -9,11 +9,12 @@ S = 208
 max_density = 100.
 randomize_params = True
 img_dims = [64,64]
-noise_scale = .1
+noise_scale = 0.
 geo_mat, geo_mat_plot = geometric_matrix(img_dims, 1)
     
-# plt.imshow(geo_mat_plot)
-# plt.show()
+plt.imshow(geo_mat_plot.T, origin='lower')
+plt.show(block=False)
+# exit(0)
 for e in range(int(num_ellipses)):
     density, projection_geo_mat, Px, Py, ellipsis_args = create_ellipsis(S, max_density, img_dims, geo_mat, randomize_params, noise_scale)
     print('density', density.shape, 'projections', projection_geo_mat.shape, Px.shape, Py.shape)
@@ -45,7 +46,7 @@ for e in range(int(num_ellipses)):
     ax_xp.plot(np.arange(S), Px[::-1], 'b')
     
     ax_proj = fig.add_subplot(222)
-    ax_proj.plot(np.arange(len(projection_geo_mat)), projection_geo_mat)
+    ax_proj.plot(np.arange(len(projection_geo_mat)), projection_geo_mat[::-1])
     ax_proj.set_title('geometric matrix projection')
     plt.show()
 
