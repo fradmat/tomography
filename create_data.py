@@ -105,9 +105,15 @@ def density(a, b, c, x, y):
 
 
 def create_ellipsis(projection_length, max_density, img_dims, geo_mat, randomize_params=True, noise_scale=.1):
-    a = random.uniform(0.0, 0.5)
-    b = random.uniform(0.0, 0.5)
     
+    # print(img_dims)
+    min_ellipsis_a = 1/img_dims[0]
+    min_ellipsis_b = 1/img_dims[1]
+    a = random.uniform(min_ellipsis_a, 0.5)
+    b = random.uniform(min_ellipsis_b, 0.5)
+    
+    
+    # exit(0)
     x0 = random.uniform(a, 1.0 - a)
     y0 = random.uniform(b, 1.0 - b)
     

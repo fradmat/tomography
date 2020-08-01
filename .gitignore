@@ -1,2 +1,4 @@
+env/
+exps/
 *.npy
 __pycache__

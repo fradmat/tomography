@@ -1,6 +1,7 @@
 import numpy as np
 import sys
 import time
+import pickle
 
 # def grid_60_40_bounded(bdmatrix):
 #     # R = np.linspace(-.5, .5, 40)
@@ -37,6 +38,16 @@ import time
 #                 pixels += [RadialPixel(np.sqrt(r**2 + Z**2), np.arctan2(Z, r)+np.pi)]
 #                 # pixels += [np.sqrt(pixel.R**2 + pixel.z**2), (np.arctan2(pixel.z, pixel.R)+np.pi)]
 #     return pixels
+
+def save_dic(dic, dirname):
+    print(dirname)
+    print(dic)
+    with open(dirname + '.pkl', 'wb') as f:
+        pickle.dump(dic, f, pickle.HIGHEST_PROTOCOL)
+
+def load_dic(name):
+    with open(name + '.pkl', 'rb') as f:
+        return pickle.load(f)
 
 def reconstruction_grid(x_len, y_len):
     R = np.linspace(0., 1., x_len)

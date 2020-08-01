@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-from matplotlib.mlab import griddata
+# from matplotlib.mlab import griddata
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
@@ -26,7 +26,7 @@ def plot_emiss_signal(emiss_mean, emiss_std, post_data_mean, post_data_std, meas
     # else:
     #     gs = gridspec.GridSpec(5, 4)
     current_cmap = plt.get_cmap('viridis')
-    current_cmap.set_bad(color='gray')
+    # current_cmap.set_bad(color='gray')
     
     norm_errors = ((emiss_std*3)/np.abs(emiss_mean)).reshape(density_shape)
     emiss_mean = emiss_mean.reshape(density_shape)
@@ -231,7 +231,7 @@ def data_histogram(best_sigmas_grid, sigma_fs, sigma_xs, sigma_errs, fpath1):
 
 def plot_measurement(measurement, err, shot, time):
     filtered_measurement = measurement[err==1]
-    mpl.use('qt4agg')
+    # mpl.use('qt4agg')
     fs = mpl.rcParams['font.size']
     font = {'size': 30}
     fig = plt.figure()
