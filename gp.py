@@ -55,7 +55,7 @@ def main(args):
     # print(densities.shape, pr_mean.shape)
     # exit(0)
     grid = reconstruction_grid(densities.shape[1], densities.shape[2])
-    # print(grid.shape)
+    # print(grid.shape, geo_mat.shape)
     # exit(0)
     gp = GaussianProcessEuclidean(geo_matrix = geo_mat,
                                   prior_mean = pr_mean,
@@ -75,9 +75,10 @@ def main(args):
     #                               sigma_errs=sigma_errs)
   
     exp = './exps/' + args[2]
-    exp_hps = {'sigma_fs':sigma_fs, 'sigma_xs':sigma_l1s, 'sigma_errs':sigma_errs}
+    measurement_dim = geo_mat.shape[0]
+    exp_hps = {'sigma_fs':sigma_fs, 'sigma_xs':sigma_l1s, 'sigma_errs':sigma_errs, 'measurement_dim':measurement_dim}
     save_dic(exp_hps, exp + '/hp_params')
-    
+    # exit(0)
     reconstruction_means = []
     reconstruction_stds = []
     data_posterior_stds = []

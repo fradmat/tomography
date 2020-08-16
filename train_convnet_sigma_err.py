@@ -13,16 +13,16 @@ from sklearn.metrics import accuracy_score
 import numpy.ma as ma
 import matplotlib as mpl
 import seaborn as sns
-from plots import plot_emiss_signal, data_err_histo, results_categorical_histo
-from gp_real_data import compute_abs_error
+# from plots import plot_emiss_signal, data_err_histo, results_categorical_histo
+# from gp_real_data import compute_abs_error
 import time
-from postprocess import post_training
+# from postprocess import post_training
 mpl.use('Agg')
 
 
  
 # dtime = get_date_time_formatted()
-exp_id = './gp/' + sys.argv[1]
+exp_id = './exps/' + sys.argv[1]
 train_dir = './experiments/' + sys.argv[1]
 if not os.path.isdir(train_dir):
     os.makedirs(train_dir)
@@ -42,14 +42,16 @@ sigma_xs = hp_dic['sigma_xs']
 sigma_errs = hp_dic['sigma_errs']   
     
 epoch_size = 128
-no_epocs = 50
-no_sensors = 208
+no_epocs = 1
+no_sensors = hp_dic['measurement_dim']
+# print(no_sensors)
+# exit(0)
 
 bsize = len(sigma_fs)*len(sigma_xs)*len(sigma_errs)*8 #32 samples per hyperparameter (of which there are 3*3*3)
-shots = get_shots()
-train_val_shots = shots#[:-11]
+# shots = get_shots()
+# train_val_shots = shots#[:-11]
 # holdout_shots = shots[-11:]
-ensemble_size = 10
+ensemble_size = 2
 
 def top_2_accuracy(y_true, y_pred):
     return top_k_categorical_accuracy(y_true, y_pred, k=2)
@@ -63,7 +65,7 @@ params_random = {'dim': no_sensors,
                   'exp_id': exp_id,
                   'batch_size': bsize,
                   'epoch_size':epoch_size,
-                  'shots': train_val_shots,
+                  # 'shots': train_val_shots,
                   'n_splits':ensemble_size
                   }
 
@@ -80,6 +82,7 @@ val_errs = []
 used_ms_all = []
 st_all = []
 pred_deltas = []
+
 for k_fold in range(mainGenerator.n_splits):
     print('----------------------------------------------Training member', k_fold+1, 'of ensemble...----------------------------------------------')
     cnn = model(no_sensors, len(sigma_fs), len(sigma_xs), len(sigma_errs), k_fold)
@@ -91,13 +94,14 @@ for k_fold in range(mainGenerator.n_splits):
     train_gen = next(iter(train_generator))
     val_generator = ValDataGenerator(k_fold, mainGenerator)
     val_gen = next(iter(val_generator))
-
+    # exit(0)
     train_start = time.time()
     cnn.fit_generator(generator = train_gen, steps_per_epoch=epoch_size, epochs=no_epocs, validation_data=val_gen, validation_steps=epoch_size)#, callbacks=[saveCheckpoint,]) #,tb ,, validation_steps=bsize
     train_end = time.time()
     print('----------------------------------------------')
     print('training took:', train_end-train_start, 'seconds')
     print('----------------------------------------------')
+    exit(0)
     inputs, targets, control = val_generator.get_all_items()
     measurements = inputs['m']#[:10]
     errs = inputs['m_err']#[:10]

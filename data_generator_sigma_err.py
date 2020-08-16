@@ -206,19 +206,18 @@ class DataGenerator():
                     
                     
         batch_in['m'] = np.expand_dims(np.asarray(batch_in['m']), axis=-1)[:self.batch_size]
-        # print(batch_in['m'].shape)
-        # exit(0)
-        # batch_in['m_err'] = np.asarray(batch_in['m_err'])[:self.batch_size]
-        batch_out['x'] = np.asarray(batch_out['x'])[:self.batch_size]
-        err = np.asarray(batch_out['err'])[:self.batch_size]
-        # ra = np.random.randn(self.batch_size)/10
-        # err += err*ra
-        batch_out['err'] = err
-        batch_out['f'] = np.asarray(batch_out['f'])[:self.batch_size]
+        
+        # batch_out['x'] = np.asarray(batch_out['x'])[:self.batch_size]
+        # err = np.asarray(batch_out['err'])[:self.batch_size]
+        # batch_out['err'] = err
+        # batch_out['f'] = np.asarray(batch_out['f'])[:self.batch_size]
+        
         batch_out['single_mclass'] = np.asarray(batch_out['single_mclass'])[:self.batch_size]
-        # batch_control['s&t'] = np.asarray(batch_control['s&t'])[:self.batch_size]
         batch_control['s&t'] = np.zeros(self.batch_size)
-        return(batch_in, batch_out, batch_control)
+        # print(batch_in['m'].shape)
+        # print(batch_out['single_mclass'].shape)
+        # exit(0)
+        return(batch_in['m'], batch_out['single_mclass']) #batch_control
         # print(batch_in['input'].shape)
         # print(batch_out['err'])
         # exit(0)
@@ -279,7 +278,7 @@ class DataGenerator():
         batch_control['s&t'] = np.asarray(batch_control['s&t'])#[:self.batch_size]
         batch_control['uid'] = np.asarray(batch_control['uid'])
         # return(batch_in, batch_out, batch_control)
-        # print(batch_in['input'].shape)
+        # print(batch_in['m'].shape)
         # print(batch_out['err'])
         # exit(0)
         return (batch_in, batch_out, batch_control)
@@ -409,11 +408,9 @@ def main():
             ms = inputs['m']
             # print(ms.shape)
             # exit(0)
-            xs = targets['x']
-            # print(ms.shape, xs.shape)
-            # exit(0)
-            fs = targets['f']
-            errs = targets['err']
+            # xs = targets['x']
+            # fs = targets['f']
+            # errs = targets['err']
             # m_err = inputs['m_err']
             # sh_time = control['s&t']
             single_mclass = targets['single_mclass']
@@ -423,7 +420,8 @@ def main():
             # print(xs.shape)
             for k in range(len(ms)):
                 # print(sh_time[k], fs[k], xs[k], errs[k], single_mclass[k])
-                print(fs[k], xs[k], errs[k], single_mclass[k])
+                # print(fs[k], xs[k], errs[k], single_mclass[k])
+                print(single_mclass[k])
                 # shot, time = sh_time[k].split('-')
                 # plot_measurement(ms[k], m_err[k], 'no shot', 'no time')
                 # break
