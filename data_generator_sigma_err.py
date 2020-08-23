@@ -14,6 +14,7 @@ import os
 import math
 # from plots import plot_measurement
 from sklearn.model_selection import KFold
+from plotting import data_histogram
 
 class DataGenerator():
     def __init__(self, batch_size=2048, dim=208, shuffle=True,
@@ -46,6 +47,7 @@ class DataGenerator():
         self.sigma_fs = self.hp_dic['sigma_fs']
         self.sigma_xs = self.hp_dic['sigma_xs']
         self.sigma_errs = self.hp_dic['sigma_errs']
+        self.name = 'main'
         # print(self.sigma_errs, type(self.sigma_errs))
         # exit(0)
         c = 0
@@ -64,9 +66,12 @@ class DataGenerator():
         # ts = np.load(exp_id + '/reconstruction_times.npy')
         measurement_data = np.load(exp_id + '/posterior_data_means.npy')
         single_mclasses = np.load(exp_id + '/single_multiclasses.npy')
+        best_sigmas_grid = np.load(exp_id + '/best_sigmas_grid.npy')
         # print(measurement_data.shape, fs.shape, xs.shape, errs.shape, errs.shape)
         # assert measurement_data.shape[0] == errs.shape[0]
         # self.measurement_data.extend(measurement_data)
+        data_histogram(best_sigmas_grid, self.sigma_fs, self.sigma_xs, self.sigma_errs, exp_id + '/data_histogram.pdf')
+        # exit(0)
         for i in range(len(measurement_data)):
             # print(i, len(self.buckets[str(0) + '-' +  str(0)+ '-' +  str(0)]['m']))
             cs += 1
@@ -134,11 +139,13 @@ class DataGenerator():
         # exit(0)
         
     def get_stats(self,):
+        print('------------------Printing stats for', self.name, 'generator------------------')
         s = 0
+        print('f,x,err,count')
         for k in self.buckets.keys():
             s+=len(self.buckets[k]['m'])
             print(k, len(self.buckets[k]['m']))
-        print(s)
+        print('Total number of samples:', s)
         
     
     def generate_empty_buckets(self,):
@@ -230,7 +237,7 @@ class DataGenerator():
         while True:
             for item in (self[i] for i in range(len(self))):
                 yield item
-            # print('reshuffling')
+            # print('Generator has gone through all its data, reshuffling...')
             self.shuffle()
     
     def on_epoch_end(self):
@@ -281,7 +288,8 @@ class DataGenerator():
         # print(batch_in['m'].shape)
         # print(batch_out['err'])
         # exit(0)
-        return (batch_in, batch_out, batch_control)
+        return(batch_in['m'], batch_out['single_mclass'])
+        # return (batch_in, batch_out, batch_control)
         
     
 class TrainDataGenerator(DataGenerator):
@@ -291,6 +299,7 @@ class TrainDataGenerator(DataGenerator):
         self.generate_empty_buckets()
         self.epoch_size = main_generator.epoch_size
         self.batch_size = main_generator.batch_size
+        self.name = 'train'
         # print(len(main_generator.buckets[str(0) + '-' +  str(0)+ '-' +  str(0)]['m']))
         # exit(0)
         for k, v in self.buckets.items():
@@ -334,7 +343,7 @@ class ValDataGenerator(DataGenerator):
         self.generate_empty_buckets()
         self.epoch_size = main_generator.epoch_size
         self.batch_size = main_generator.batch_size
-        
+        self.name = 'validation'
         for k, v in self.buckets.items():
             # main_gen_len = len(main_generator.buckets[k]['m'])
             # frac = math.ceil(0.8*main_gen_len)
@@ -360,11 +369,11 @@ class ValDataGenerator(DataGenerator):
     def __str__(self,):
         return 'test'
 
-def main():
+def main(args):
   
     # savedir=sys.argv[1]
     
-    exp_id = './exps/' + sys.argv[1]
+    exp_id = './exps/' + args[1]
     # sigmafs, sigmaerrs, sigmaxs = load_prior_definition(exp_id)
     hp_dic = load_dic(exp_id + '/hp_params')
     sigma_fs = hp_dic['sigma_fs']
@@ -404,16 +413,12 @@ def main():
                 break
             samples = []
             samples_df = pd.DataFrame(columns=['input', 'f', 'x', 's&t'])
-            inputs, targets, control = batch
-            ms = inputs['m']
-            # print(ms.shape)
-            # exit(0)
-            # xs = targets['x']
-            # fs = targets['f']
-            # errs = targets['err']
-            # m_err = inputs['m_err']
-            # sh_time = control['s&t']
-            single_mclass = targets['single_mclass']
+            # inputs, targets, control = batch
+            inputs, targets = batch
+            # ms = inputs['m']
+            ms = inputs
+            # single_mclass = targets['single_mclass']
+            single_mclass = targets
             # print('len batch', len(batch))
             # for k in range(len(ms)):
             #     print(sh_time[k], fs[k], xs[k])
@@ -421,12 +426,13 @@ def main():
             for k in range(len(ms)):
                 # print(sh_time[k], fs[k], xs[k], errs[k], single_mclass[k])
                 # print(fs[k], xs[k], errs[k], single_mclass[k])
-                print(single_mclass[k])
+                # print(single_mclass[k])
                 # shot, time = sh_time[k].split('-')
                 # plot_measurement(ms[k], m_err[k], 'no shot', 'no time')
                 # break
+                pass
             count += 1
-            print('finished batch')
+            # print('finished batch')
             # print(errs[0])
             
         # count = 0    
@@ -460,4 +466,4 @@ def main():
 
         
 if __name__ == "__main__":
-    main()
+    main(sys.argv)

@@ -45,8 +45,8 @@ def main(args):
     print(densities.shape, projections.shape, density_args.shape)
     
     sigma_fs = np.asarray([10, 75, 250])
-    sigma_l1s = np.asarray([.1, .15, .2])
-    sigma_l2s = np.asarray([.1, .15, .2])
+    sigma_l1s = np.asarray([.125, .175, .225])
+    # sigma_l2s = np.asarray([.1, .15, .2])
     sigma_errs = np.asarray([.5, 1.])
     
     density_shape = (densities.shape[1], densities.shape[2])
@@ -162,6 +162,7 @@ def main(args):
     np.save(exp + '/reconstruction_sigma_errs', np.asarray(reconstruction_sigma_errs))
     np.save(exp + '/reconstruction_sigma_fs', np.asarray(reconstruction_sigma_fs))
     np.save(exp + '/reconstruction_sigma_xs', np.asarray(reconstruction_sigma_l1s))
+    np.save(exp + '/best_sigmas_grid', np.asarray(best_sigmas_grid))
     
 if __name__ == '__main__':
     main(sys.argv)

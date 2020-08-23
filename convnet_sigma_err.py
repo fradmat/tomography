@@ -47,5 +47,5 @@ def model(no_sensors, no_sigmafs, no_sigmaxs, no_sigmaerrs, k_fold):
     model = Model(inputs=[conv_input,], outputs=[target_single_mclass,]) #full_c_input
     
     if k_fold == 0:
-        print(model.summary())
+        model.summary() #prints the model summary
     return model
