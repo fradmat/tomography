@@ -1,18 +1,14 @@
 import numpy as np
-# import keras
 import pandas as pd
 import abc
-# from os import *
 import sys
 import matplotlib.pyplot as plt
 import random
-# from gaussian_process import *
 import csv
 import glob
 from gp_backend import load_dic
 import os
 import math
-# from plots import plot_measurement
 from sklearn.model_selection import KFold
 from plotting import data_histogram
 
@@ -29,17 +25,9 @@ class DataGenerator():
         self.batch_size = batch_size
         self.dim = dim
         
-        # self.fs = []
-        # self.xs = []
-        # self.errs = []
         self.measurement_data = []
-        # shots = get_shots()
-        # self.shots = shots
-        # file_names = os.listdir('./shot_data/sxr')
         self.n_splits = n_splits
-        # print(exp_id)
         self.hp_dic = load_dic(exp_id + '/hp_params')
-        # print(self.hp_dic)
         
         self.epoch_size = epoch_size
         self.generate_empty_buckets()
@@ -48,18 +36,8 @@ class DataGenerator():
         self.sigma_xs = self.hp_dic['sigma_xs']
         self.sigma_errs = self.hp_dic['sigma_errs']
         self.name = 'main'
-        # print(self.sigma_errs, type(self.sigma_errs))
-        # exit(0)
         c = 0
         cs = 0
-        # for counter, file_name in enumerate(file_names):
-            # shot_id = file_name[5:10]
-            # if int(shot_id) not in self.shots:# 30857, ]:#30294, 30310, 30357, 30372, 30376, 30400, 30405, 30406]:  #shots[:50] [30382,]  [30573, 30857]
-            #     continue
-            # c += 1
-        # np_file = np.load('./shot_data/sxr/' + file_name)
-        # measurement_data = np_file['data']#[:30]
-        # measurement_err = np_file['err']
         errs = np.load(exp_id + '/reconstruction_sigma_errs.npy')
         fs = np.load(exp_id + '/reconstruction_sigma_fs.npy')
         xs = np.load(exp_id + '/reconstruction_sigma_xs.npy')
@@ -213,22 +191,9 @@ class DataGenerator():
                     
                     
         batch_in['m'] = np.expand_dims(np.asarray(batch_in['m']), axis=-1)[:self.batch_size]
-        
-        # batch_out['x'] = np.asarray(batch_out['x'])[:self.batch_size]
-        # err = np.asarray(batch_out['err'])[:self.batch_size]
-        # batch_out['err'] = err
-        # batch_out['f'] = np.asarray(batch_out['f'])[:self.batch_size]
-        
         batch_out['single_mclass'] = np.asarray(batch_out['single_mclass'])[:self.batch_size]
         batch_control['s&t'] = np.zeros(self.batch_size)
-        # print(batch_in['m'].shape)
-        # print(batch_out['single_mclass'].shape)
-        # exit(0)
         return(batch_in['m'], batch_out['single_mclass']) #batch_control
-        # print(batch_in['input'].shape)
-        # print(batch_out['err'])
-        # exit(0)
-        # return (batch_in, batch_out['single_mclass'])
     
     def __iter__(self):
         return self
@@ -370,9 +335,7 @@ class ValDataGenerator(DataGenerator):
         return 'test'
 
 def main(args):
-  
     # savedir=sys.argv[1]
-    
     exp_id = './exps/' + args[1]
     # sigmafs, sigmaerrs, sigmaxs = load_prior_definition(exp_id)
     hp_dic = load_dic(exp_id + '/hp_params')
@@ -432,38 +395,9 @@ def main(args):
                 # break
                 pass
             count += 1
-            # print('finished batch')
-            # print(errs[0])
-            
-        # count = 0    
-        # for batch in val_gen:
-        #     if count == 1:
-        #         break
-        #     samples = []
-        #     samples_df = pd.DataFrame(columns=['input', 'f', 'x', 's&t'])
-        #     inputs, targets, control = batch
-        #     ms = inputs['m']
-        #     print(ms.shape)
-        #     # xs = targets['x']
-        #     # fs = targets['f']
-        #     # errs = targets['err']
-        #     # m_err = inputs['m_err']
-        #     # sh_time = control['s&t']
-        #     single_mclass = targets['single_mclass']
-        #     print('len batch', len(batch))
-        #     # for k in range(len(ms)):
-        #     #     print(sh_time[k], fs[k], xs[k])
-        #     for k in range(len(ms)):
-        #         # print(sh_time[k], fs[k], xs[k], errs[k], single_mclass[k])
-        #         # shot, time = sh_time[k].split('-')
-        #         # plot_measurement(ms[k], shot, time)
-        #         break
-        #     count += 1
-        #     print('finished batch')
-        #     # print(errs[0])
-        # 
       
-
+def data_generator_data_jupyter_call(args):
+    main(args)
         
 if __name__ == "__main__":
     main(sys.argv)

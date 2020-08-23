@@ -17,7 +17,7 @@ from plotting import results_categorical_histo #plot_emiss_signal, data_err_hist
 # from gp_real_data import compute_abs_error
 import time
 # from postprocess import post_training
-mpl.use('Agg')
+# mpl.use('Agg')
 from matplotlib.backends.backend_pdf import PdfPages
 
  
@@ -27,7 +27,7 @@ def main(args):
     if not os.path.isdir(train_dir):
         os.makedirs(train_dir)
     print('Will save this model to', train_dir)
-    
+    # exit(0)
     checkpoint_dir = train_dir +'/model_checkpoints/'
     if not os.path.isdir(checkpoint_dir):
         os.makedirs(checkpoint_dir)
@@ -41,8 +41,8 @@ def main(args):
     sigma_xs = hp_dic['sigma_xs']
     sigma_errs = hp_dic['sigma_errs']   
         
-    epoch_size = 128 #128
-    no_epocs = 5
+    epoch_size = int(args[2]) #128
+    no_epocs = int(args[3])
     no_sensors = hp_dic['measurement_dim']
     # print(no_sensors)
     # exit(0)
@@ -82,7 +82,7 @@ def main(args):
     # pred_deltas = []
     
     for k_fold in range(mainGenerator.n_splits):
-        print('----------------------------------------------Training member', k_fold+1, 'of ensemble...----------------------------------------------')
+        print('------------------------------------Training member', k_fold+1, 'of ensemble...--------------------------------------')
         cnn = model(no_sensors, len(sigma_fs), len(sigma_xs), len(sigma_errs), k_fold)
     
     
@@ -103,10 +103,10 @@ def main(args):
         print('training took:', train_end-train_start, 'seconds')
         print('----------------------------------------------')
     
-        scores = get_scores(train_generator, cnn, num_classes)
+        scores = get_scores(train_generator, cnn, num_classes, k_fold, 'train')
         scores_matrix[str(train_generator)][k_fold] = np.asarray(scores)
     
-        scores = get_scores(val_generator, cnn, num_classes)
+        scores = get_scores(val_generator, cnn, num_classes, k_fold, 'validation')
         scores_matrix[str(val_generator)][k_fold] = np.asarray(scores)
         
         
@@ -125,18 +125,19 @@ def main(args):
     # print(scores_matrix[str(val_generator)].shape)
     # print(np.mean(scores_matrix[str(val_generator)], axis=0))
     # print(np.var(scores_matrix[str(val_generator)], axis=0))
-    pdf_handler = PdfPages(exp_id + '/accuracy_histogram_val.pdf')
-    results_categorical_histo(pdf_handler, scores_matrix[str(val_generator)])
+    
     pdf_handler = PdfPages(exp_id + '/accuracy_histogram_train.pdf')
-    results_categorical_histo(pdf_handler, scores_matrix[str(train_generator)])
+    results_categorical_histo(pdf_handler, scores_matrix[str(train_generator)], 'Train Data')
+    pdf_handler = PdfPages(exp_id + '/accuracy_histogram_val.pdf')
+    results_categorical_histo(pdf_handler, scores_matrix[str(val_generator)], 'Validation Data')
 
-def get_scores(generator, cnn, num_classes):
+def get_scores(generator, cnn, num_classes, k_fold, data_type):
     inputs, targets = generator.get_all_items()
     measurements = inputs
     labels = targets#[:10]
     labels_argmax = np.argmax(labels, axis=1)
     
-    print('classifier predicting on its val data, whose shape is', measurements.shape, labels.shape)#, train_val_hps[:100].shape) errs.shape,  labels_argmax.shape
+    print('classifier', k_fold, 'predicting on its', data_type, ' data, whose shape is', measurements.shape, labels.shape)#, train_val_hps[:100].shape) errs.shape,  labels_argmax.shape
     # pred_start = time.time()
     pred_hps = cnn.predict(measurements)
     # pred_end = time.time()
@@ -158,6 +159,9 @@ def get_scores(generator, cnn, num_classes):
         acc_h.append(acc_sum/len(labels_argmax))
         acc_list.extend(np.ones(acc_sum) * k)
     return acc_h
+
+def train_model_jupyter_call(args):
+    main([''] + args)
 
 if __name__ == '__main__':
     main(sys.argv)

@@ -44,6 +44,7 @@ def data_histogram(best_sigmas_grid, sigma_fs, sigma_xs, sigma_errs, fpath1):
     # g.xaxis.set_minor_locator(AutoMinorLocator)
     plt.xlabel('Class', size=24)
     plt.ylabel('Count', size=24)
+    plt.title('Distribution of data among classes')
     plt.tight_layout(rect=[0, 0, 1, 0.92])
     figure = g.get_figure()
     figure.savefig(fpath1)
@@ -56,7 +57,7 @@ def data_histogram(best_sigmas_grid, sigma_fs, sigma_xs, sigma_errs, fpath1):
 # def data_err_histo(mse_errs, fpath1, fpath2, err_type=''):
 
     
-def results_categorical_histo(pdf_handler, scores_matrix):
+def results_categorical_histo(pdf_handler, scores_matrix, data_type):
     # print('scores matrix, top-k accuracy mean across k-folds', np.mean(scores_matrix, axis=0).round(3))
     # print('scores matrix, top-k accuracy std across k-folds', np.std(scores_matrix, axis=0).round(3))
 
@@ -75,6 +76,7 @@ def results_categorical_histo(pdf_handler, scores_matrix):
         tick.label.set_fontsize(15)
     plt.xlabel('K', size=24)
     plt.ylabel('Top-k accuracy', size=24)
+    plt.title(data_type)
     plt.tight_layout(rect=[0, 0, 1, .95])
     plt.show()
     # pdf_handler.savefig()
